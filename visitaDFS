@@ -1,0 +1,113 @@
+package dfs.nomecognome.code;
+
+import java.util.ArrayList;
+
+import graphLib.Edge;
+import graphLib.GraphInterface;
+
+public class DFS {
+	GraphInterface grafo;
+	GraphInterface alberoDFS;
+	private boolean[] scoperto;
+	ArrayList<Integer> nodiVisitatiInOrdine;
+	int distanza[];
+	
+	public DFS (GraphInterface grafoInput) {
+		//analogamente a quanto avete fatto per la BFS
+		this.grafo=grafoInput;//memorizzare il grafo in input nella variabile di istanza
+		this.scoperto=new boolean[grafo.getOrder()];//costruire un oggetto per ogni altra variabile di istanza
+		this.nodiVisitatiInOrdine=new ArrayList<Integer>();
+		this.distanza=new int[grafo.getOrder()];
+		for(int i=0;i<grafo.getOrder();i++) {
+			scoperto[i]=false;
+			distanza[i]=-1;
+			init();
+	}
+	}
+	
+	
+	private void init() {
+		//analogamente a quanto avevo suggerito per la BFS
+		//per creare l'albero fate cosi':
+		alberoDFS = grafo.create();
+		
+		
+	}
+
+    public GraphInterface eseguiDFS() throws NotAllNodesReachedException {
+        for (int i = 0; i < grafo.getOrder(); i++) {
+            if (!scoperto[i]) {
+                visitaDFS(i);
+            }
+        }
+        return alberoDFS;
+    }
+	
+	private void visitaDFS(int sorgente) throws NotAllNodesReachedException {
+		if(sorgente<0||sorgente>=grafo.getOrder()) {
+			throw new IllegalArgumentException("Non valido"+sorgente);
+		}
+	scoperto[sorgente]=true;
+
+	for(int nodoAdiacente:grafo.getNeighbors(sorgente)) {
+		if(!scoperto[nodoAdiacente]) {
+			visitaDFS(nodoAdiacente);
+			this.alberoDFS.addEdge(sorgente,nodoAdiacente);
+			
+		}
+		nodiVisitatiInOrdine.add(sorgente);
+		
+	}
+	 for (int i = 0; i < grafo.getOrder(); i++) {
+	        if (!scoperto[i]) {
+	            throw new NotAllNodesReachedException("Non tutti i nodi sono stati raggiunti durante la visita DFS");
+	        }
+	}
+	        }
+	
+	public GraphInterface getDFStree (int sorgente) throws NotAllNodesReachedException {
+		init();
+		visitaDFS(sorgente);
+		return alberoDFS;
+	}
+	
+	
+	public ArrayList<Integer> getNodesInOrderPostVisit (int sorgente) { 
+		init();
+		ArrayList<Integer> postVisitOrder=new ArrayList<>();
+		visitaDFSPostVisit(sorgente,postVisitOrder);
+		return postVisitOrder;
+		
+	}
+	
+	private void visitaDFSPostVisit(int nodo,ArrayList<Integer> postVisitOrder) {
+		scoperto[nodo]=true;
+		
+		for(Integer nodoAdiacente:grafo.getNeighbors(nodo)) {
+			if(!scoperto[nodoAdiacente]) {
+				visitaDFSPostVisit(nodoAdiacente,postVisitOrder);
+			}
+			
+			
+		}
+		postVisitOrder.add(nodo);
+	}
+	
+	
+	
+	
+	public GraphInterface getDFSForest () throws NotAllNodesReachedException { 
+		init();
+		for(int i=0;i<grafo.getOrder();i++) {
+			if(!scoperto[i]) {
+				visitaDFS(i);
+			}
+			
+			
+		}
+		return alberoDFS;
+		
+	
+	}
+
+}
